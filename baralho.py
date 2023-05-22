@@ -1,20 +1,23 @@
 from flashcard import Flashcard
 from random import randrange
+from random import choice
 
-__flashcard = list()
-
-class Baralho:
-    def __init__():
-        criarBaralhoInicial()
+class Baralho(Flashcard):
+    def __init__(self) -> None:
+        self.__flashcard: list(Flashcard) = list()
+        self.criarBaralhoInicial()
 
     def inserirFlashcard(self, pergunta, resposta, nivel):
-        self.__flashcard.append(Flashcard(pegunta, resposta, nivel))
+        self.__flashcard.append(Flashcard(pergunta, resposta, nivel))
 
-    def sortearFlashcard(self):
-        i = randrange(len(__flashcard)-1)
-        while (__flashcard.index(i)).getUtilizado() != True:
-            i = randrange(len(__flashcard)-1)
-        return __flashcard.index(i)
+    def sortearFlashcard(self)-> Flashcard | None:
+        valid_indices: list(Flashcard) = [index for index, flashcard in enumerate(self.__flashcard) if not flashcard.getUtilizado()]
+        print(valid_indices)
+        if valid_indices:
+            i = choice(valid_indices)
+            return self.__flashcard[i]
+        else:
+            return None
 
     def criarBaralhoInicial(self): 
        self.__flashcard.append(Flashcard("O que é arquitetura de software?",
@@ -47,4 +50,5 @@ class Baralho:
        self.__flashcard.append(Flashcard("Explique a arquitetura de microfrontends.",
                                          "A arquitetura de microfrontends divide a interface do usuário em componentes independentes, permitindo o desenvolvimento e a implantação separados.",
                                          3))
+       print(self.__flashcard)
        

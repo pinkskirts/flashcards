@@ -1,7 +1,11 @@
+#:kivy 2.2.0
 GerenciadorJanelas:
     MenuPrincipal:
     SessaoFlashcards:
     Configuracoes:
+    Sessao:
+    FinalizarSessao:
+    RespostaFlashcard:
 
 <MenuPrincipal>:
     name: "menu"
@@ -23,7 +27,7 @@ GerenciadorJanelas:
                 text: "Começar"
                 font_size: 32
                 on_release:
-                    app.root.current = "sessao"
+                    app.root.current = "flashcardSessao"
                     root.manager.transition.direction = "left"
 
             Button:
@@ -40,7 +44,7 @@ GerenciadorJanelas:
                     exit()
 
 <SessaoFlashcards>:
-    name: "sessao"    
+    name: "flashcardSessao"
     GridLayout:
         cols: 1
         size: root.width, root.height
@@ -50,6 +54,12 @@ GerenciadorJanelas:
 
         GridLayout:
             cols: 2
+            Button:
+                text: "Iniciar Sessao"
+                font_size: 32
+                on_release:
+                    app.root.current = "sessao"
+                    root.manager.transition.direction = "right"
 
             Button:
                 text: "Voltar para o Menu"
@@ -60,3 +70,66 @@ GerenciadorJanelas:
 
 <Configuracoes>:
     name: "configuracoes"
+
+<RespostaFlashcard>:
+    name: "respostaFlashcard"
+    qtdAcertos: qtdAcertos
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: "Sessao Finalizada"
+
+        Label:
+            id: qtdAcertos
+            text: "AQUI"
+
+        Button:
+            text: "Sair"
+            on_release: app.root.current = 'flashcardSessao'
+
+<FinalizarSessao>:
+    name: "finalizarSessao"
+    resposta: resposta
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            id: resposta
+            text: "Sessao Finalizada"
+
+        Label:
+            text: "Correta"
+
+        Label:
+            text: "Incorreta"
+
+        Button:
+            text: "Sair"
+            on_release: app.root.current = 'respostaFlashcard'
+
+<Sessao>:
+    name: "sessao"
+    question_label: question_label
+
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: question_label
+            text: root.question_text
+        Button:
+            text: "Mostrar Resposta"
+            on_release: app.root.current = 'respostaFlashcard'
+
+        Button:
+            text: "Passar Flashcard"
+            on_release: root.passar_flashcard_pressed()
+
+        Button:
+            text: "Ressortear Flashcard"
+            on_release: root.ressoterar_flashcard_pressed()
+        Button:
+            on_release: app.root.current = 'finalizarSessao'
+            text: "Sair"

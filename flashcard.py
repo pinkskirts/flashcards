@@ -1,4 +1,4 @@
-class Flashcard:
+class Flashcard():
     def __init__(self, pergunta, resposta, nivel):
         self.__pergunta = pergunta
         self.__resposta = resposta
