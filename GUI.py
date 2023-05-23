@@ -16,9 +16,7 @@ class SessaoFlashcards(Screen):
     pass
 
 class Configuracoes(Screen):
-    pass
-
-class GerenciadorJanelas(ScreenManager):
+    baralho = ObjectProperty(None)
     pass
 
 class FinalizarSessao(Screen):
@@ -26,28 +24,26 @@ class FinalizarSessao(Screen):
     def __init__(self, **kwargs):
         super(FinalizarSessao, self).__init__(**kwargs)
 
-    def on_enter(self):
-            print(self.acertos)
-
-class Sessao(Screen, Baralho):
+class Sessao(Screen):
     def __init__(self, **kwargs):
         super(Sessao, self).__init__(**kwargs)
-        self.flashcard = self.sortearFlashcard()
-        self.acertos = 0
+        self.acertos = 1
+        self.baralho = Baralho()
+        self.flashcard = self.baralho.sortearFlashcard()
 
     def on_enter(self):
         self.ids.flashcard_label.text = "Pergunta: " + self.flashcard.getPergunta()
             
     def passar_flashcard_pressed(self):
         self.flashcard.setUtilizadoTrue()
-        self.atualizar_pergunta(self.sortearFlashcard())
+        self.atualizar_pergunta(self.baralho.sortearFlashcard())
 
     def acertei_pressed(self):
         self.flashcard.acertou()
         self.acertos = self.acertos + 1
         self.flashcard.setUtilizadoTrue()
         self.flashcard.aumentarCaixa()
-        self.flashcard = self.sortearFlashcard()
+        self.flashcard = self.baralho.sortearFlashcard()
         self.atualizar_pergunta(self.flashcard)
         self.ids.acertei_button.disabled = True
         self.ids.errei_button.disabled = True
@@ -56,7 +52,7 @@ class Sessao(Screen, Baralho):
     def errei_pressed(self):
         self.flashcard.setUtilizadoTrue()
         self.flashcard.diminuirCaixa()
-        self.flashcard = self.sortearFlashcard()
+        self.flashcard = self.baralho.sortearFlashcard()
         self.atualizar_pergunta(self.flashcard)
         self.ids.acertei_button.disabled = True
         self.ids.errei_button.disabled = True
@@ -66,8 +62,6 @@ class Sessao(Screen, Baralho):
         if flashcard != None:
             self.ids.flashcard_label.text = "Pergunta: " + self.flashcard.getPergunta()
             return
-        Aplicacao().on_acertos(str(self.acertos))
-        print(self.acertos)
 
     def check_flashcard(self):
         return self.flashcard
@@ -84,11 +78,22 @@ class Sessao(Screen, Baralho):
         self.ids.errei_button.disabled = False
 
 class Aplicacao(App):
-    gmanager = GerenciadorJanelas()
-    kv = Builder.load_file('interface.kv')
+    gmanager = None
+    finalizarSessao = None
+    configuracao = None
+    sessao = None
     def build(self):
-        return self.kv
+        return Builder.load_file('interface.kv')
+
+    def on_start(self):
+       self.gmanager = self.root.ids.gmanager
+       self.finalizarSessao = self.root.ids.gmanager.get_screen('finalizarSessao')
+       self.configuracao = self.root.ids.gmanager.get_screen('configuracoes')
+       self.sessao = self.root.ids.gmanager.get_screen('sessao')
 
     def on_acertos(self, valor):
-        finalizarSessao = self.kv.ids.gmanager.get_screen('finalizarSessao')
-        finalizarSessao.acertos = valor
+        self.finalizarSessao.acertos = valor
+
+    def on_baralho(self, valor):
+        self.configuracao.baralho = valor
+

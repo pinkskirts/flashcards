@@ -1,12 +1,18 @@
 #:kivy 2.2.0
-GerenciadorJanelas:
-    id: gmanager
-    MenuPrincipal:
-    SessaoFlashcards:
-    Configuracoes:
-    Sessao:
-    FinalizarSessao:
-        name: 'finalizarSessao'
+GridLayout:
+    cols: 1
+    ScreenManager:
+        id: gmanager
+        MenuPrincipal:
+            name: 'menu'
+        SessaoFlashcards:
+            name: 'sessaoFlashcard'
+        Configuracoes:
+            name: 'configuracoes'
+        Sessao:
+            name: 'sessao'
+        FinalizarSessao:
+            name: 'finalizarSessao'
 
 <MenuPrincipal>:
     name: "menu"
@@ -28,14 +34,14 @@ GerenciadorJanelas:
                 text: "Começar"
                 font_size: 32
                 on_release:
-                    app.root.current = "flashcardSessao"
+                    root.manager.current = 'sessaoFlashcard'
                     root.manager.transition.direction = "left"
 
             Button:
                 text: "Configurações"
                 font_size: 32
                 on_release:
-                    app.root.current = "configuracoes"
+                    root.manager.current = 'configuracoes'
                     root.manager.transition.direction = "left"
 
             Button:
@@ -45,7 +51,6 @@ GerenciadorJanelas:
                     exit()
 
 <SessaoFlashcards>:
-    name: "flashcardSessao"
     GridLayout:
         cols: 1
         size: root.width, root.height
@@ -59,21 +64,19 @@ GerenciadorJanelas:
                 text: "Iniciar Sessao"
                 font_size: 32
                 on_release:
-                    app.root.current = "sessao"
+                    root.manager.current = 'sessao'
                     root.manager.transition.direction = "right"
 
             Button:
                 text: "Voltar para o Menu"
                 font_size: 32
                 on_release:
-                    app.root.current = "menu"
+                    root.manager.current = 'menu'
                     root.manager.transition.direction = "right"
 
 <Configuracoes>:
-    name: "configuracoes"
 
 <FinalizarSessao>:
-    name: "finalizarSessao"
     GridLayout:
         cols: 1
 
@@ -82,11 +85,11 @@ GerenciadorJanelas:
 
         Label:
             id: corretas
-            text: "Correstas: " + root.acertos
+            text: "Flashcards Respondidos corretamente: " + root.acertos
 
         Button:
             text: "Sair"
-            on_release: app.root.current = 'menu'
+            on_release: root.manager.current = 'menu'
 
 <Sessao>:
     name: "sessao"
@@ -134,8 +137,11 @@ GerenciadorJanelas:
                 on_release:
                     root.acertei_pressed()
                     if root.check_flashcard() == None: \
-                    app.root.current = 'finalizarSessao'
-                on_release: app.on_acertos(str(root.acertos))
+                    root.manager.current = 'finalizarSessao'
+                on_release:
+                    app.on_acertos(str(root.acertos))
+                    app.on_baralho(root.baralho)
+                    
 
             Button:
                 id: errei_button
@@ -144,8 +150,10 @@ GerenciadorJanelas:
                 on_release:
                     root.errei_pressed()
                     if root.check_flashcard() == None: \
-                    app.root.current = 'finalizarSessao'
-                on_release: app.on_acertos(str(root.acertos))
+                    root.manager.current = 'finalizarSessao'
+                on_release:
+                    app.on_acertos(str(root.acertos))
+                    app.on_baralho(root.baralho)
 
 
             Button:
@@ -153,5 +161,5 @@ GerenciadorJanelas:
                 on_release: root.passar_flashcard_pressed()
 
             Button:
-                on_release: app.root.current = 'finalizarSessao'
+                on_release: root.manager.current = 'finalizarSessao'
                 text: "Sair"
