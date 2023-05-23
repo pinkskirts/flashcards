@@ -19,6 +19,16 @@ class Baralho(Flashcard):
         else:
             return None
 
+    def resetarMarcadorUtilizado(self):
+        for i in range(len(self.__flashcard)):
+            self.__flashcard[i].setUtilizadoFalse()
+
+    def removerFlashcard(self, indice):
+        self.__flashcard.pop(indice)
+
+    def getFlashcards(self):
+        return self.__flashcard
+
     def criarBaralhoInicial(self) -> None: 
        self.__flashcard.append(Flashcard("O que é arquitetura de software?",
                                          "A arquitetura de software é a estrutura fundamental e organização de um sistema de software.",

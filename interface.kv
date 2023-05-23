@@ -13,6 +13,10 @@ GridLayout:
             name: 'sessao'
         FinalizarSessao:
             name: 'finalizarSessao'
+        InserirFlashcard:
+            name: 'inserirFlashcard'    
+        RemoverFlashcard:
+            name: 'removerFlashcard'    
 
 <MenuPrincipal>:
     name: "menu"
@@ -38,13 +42,6 @@ GridLayout:
                     root.manager.transition.direction = "left"
 
             Button:
-                text: "Configurações"
-                font_size: 32
-                on_release:
-                    root.manager.current = 'configuracoes'
-                    root.manager.transition.direction = "left"
-
-            Button:
                 text: "Sair"        
                 font_size: 32
                 on_release:
@@ -66,6 +63,15 @@ GridLayout:
                 on_release:
                     root.manager.current = 'sessao'
                     root.manager.transition.direction = "right"
+                    app.on_baralho_sessao(root.baralho)
+
+            Button:
+                text: "Configurações"
+                font_size: 32
+                on_release:
+                    root.manager.current = 'configuracoes'
+                    root.manager.transition.direction = "left"
+                    app.on_baralho_configuracao(root.baralho)
 
             Button:
                 text: "Voltar para o Menu"
@@ -75,6 +81,67 @@ GridLayout:
                     root.manager.transition.direction = "right"
 
 <Configuracoes>:
+    GridLayout:
+        cols: 3
+        Button:
+            text: "Inserir Flashcard"
+            font_size: 32
+            on_release:
+                root.manager.current = 'inserirFlashcard'
+                app.on_baralho_inserir(root.baralho)
+        Button:
+            text: "Remover Flashcard"
+            font_size: 32
+            on_release:
+                root.manager.current = 'removerFlashcard'
+                app.on_baralho_remover(root.baralho)
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'sessaoFlashcard'
+        
+<InserirFlashcard>:
+    GridLayout:
+        cols: 2
+        TextInput:
+            id: pergunta
+            multiline: False
+        TextInput:
+            id: resposta
+            multiline: False
+        Button:
+            text: "Inserir"
+            font_size: 32
+            on_release:
+                root.inserir_pressed()
+                app.atualizarBaralho(root.baralho)
+                root.manager.current = 'configuracoes'
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'configuracoes'
+ 
+ 
+<RemoverFlashcard>:
+    GridLayout:
+        cols: 2
+        Label:
+            id: display
+        TextInput:
+            id: remover
+            multiline: False
+        Button:
+            text: "Remover"
+            font_size: 32
+            on_release:
+                root.remover_pressed()
+                app.atualizarBaralho(root.baralho)
+                root.manager.current = 'configuracoes'
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'sessaoFlashcard'
+ 
 
 <FinalizarSessao>:
     GridLayout:
@@ -140,8 +207,6 @@ GridLayout:
                     root.manager.current = 'finalizarSessao'
                 on_release:
                     app.on_acertos(str(root.acertos))
-                    app.on_baralho(root.baralho)
-                    
 
             Button:
                 id: errei_button
@@ -153,12 +218,15 @@ GridLayout:
                     root.manager.current = 'finalizarSessao'
                 on_release:
                     app.on_acertos(str(root.acertos))
-                    app.on_baralho(root.baralho)
 
 
             Button:
                 text: "Passar Flashcard"
-                on_release: root.passar_flashcard_pressed()
+                on_release:
+                    root.passar_flashcard_pressed()
+                    if root.check_flashcard() == None: \
+                    root.manager.current = 'finalizarSessao'
+                on_release: app.on_acertos(str(root.acertos))
 
             Button:
                 on_release: root.manager.current = 'finalizarSessao'
