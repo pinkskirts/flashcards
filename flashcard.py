@@ -22,6 +22,9 @@ class Flashcard():
     def getUtilizado(self):
         return self.__utilizado
 
+    def getNivel(self):
+        return self.__nivel
+
     def setUtilizadoFalse(self):
         self.__utilizado = False
         

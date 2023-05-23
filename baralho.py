@@ -7,10 +7,10 @@ class Baralho(Flashcard):
         self.__flashcard: list(Flashcard) = list()
         self.criarBaralhoInicial()
 
-    def inserirFlashcard(self, pergunta, resposta, nivel):
+    def inserirFlashcard(self, pergunta, resposta, nivel) -> None:
         self.__flashcard.append(Flashcard(pergunta, resposta, nivel))
 
-    def sortearFlashcard(self)-> Flashcard | None:
+    def sortearFlashcard(self) -> Flashcard | None:
         valid_indices: list(Flashcard) = [index for index, flashcard in enumerate(self.__flashcard) if not flashcard.getUtilizado()]
         print(valid_indices)
         if valid_indices:
@@ -19,7 +19,7 @@ class Baralho(Flashcard):
         else:
             return None
 
-    def criarBaralhoInicial(self): 
+    def criarBaralhoInicial(self) -> None: 
        self.__flashcard.append(Flashcard("O que é arquitetura de software?",
                                          "A arquitetura de software é a estrutura fundamental e organização de um sistema de software.",
                                          1))

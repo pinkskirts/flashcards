@@ -1,11 +1,12 @@
 #:kivy 2.2.0
 GerenciadorJanelas:
+    id: gmanager
     MenuPrincipal:
     SessaoFlashcards:
     Configuracoes:
     Sessao:
     FinalizarSessao:
-    RespostaFlashcard:
+        name: 'finalizarSessao'
 
 <MenuPrincipal>:
     name: "menu"
@@ -71,65 +72,86 @@ GerenciadorJanelas:
 <Configuracoes>:
     name: "configuracoes"
 
-<RespostaFlashcard>:
-    name: "respostaFlashcard"
-    qtdAcertos: qtdAcertos
-
-    BoxLayout:
-        orientation: 'vertical'
-
-        Label:
-            text: "Sessao Finalizada"
-
-        Label:
-            id: qtdAcertos
-            text: "AQUI"
-
-        Button:
-            text: "Sair"
-            on_release: app.root.current = 'flashcardSessao'
-
 <FinalizarSessao>:
     name: "finalizarSessao"
-    resposta: resposta
-
-    BoxLayout:
-        orientation: 'vertical'
+    GridLayout:
+        cols: 1
 
         Label:
-            id: resposta
             text: "Sessao Finalizada"
 
         Label:
-            text: "Correta"
-
-        Label:
-            text: "Incorreta"
+            id: corretas
+            text: "Correstas: " + root.acertos
 
         Button:
             text: "Sair"
-            on_release: app.root.current = 'respostaFlashcard'
+            on_release: app.root.current = 'menu'
 
 <Sessao>:
     name: "sessao"
-    question_label: question_label
-
-    BoxLayout:
-        orientation: 'vertical'
+    flashcard: self.flashcard
+    GridLayout:
+        cols: 1
+        padding: 20
+        spacing: 20
+        
         Label:
-            id: question_label
-            text: root.question_text
-        Button:
-            text: "Mostrar Resposta"
-            on_release: app.root.current = 'respostaFlashcard'
+            id: flashcard_label
+            angle: 0
+            background_color: 250/255.0, 237/255.0, 161/255.0, 98/255.0
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    axis: 1,0,0
+                    origin: self.center
+                Color:
+                    rgba: self.background_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            canvas.after:
+                PopMatrix        
 
-        Button:
-            text: "Passar Flashcard"
-            on_release: root.passar_flashcard_pressed()
+        GridLayout:
+            cols: 3
+            rows: 2
+            row_default_height: 240
+            row_force_default: True
 
-        Button:
-            text: "Ressortear Flashcard"
-            on_release: root.ressoterar_flashcard_pressed()
-        Button:
-            on_release: app.root.current = 'finalizarSessao'
-            text: "Sair"
+            Button:
+                id: mostrar_resposta_button
+                text: "Mostrar Resposta"
+                on_release:
+                    root.animacaoFlashcard(flashcard_label)
+                    root.mostrar_resposta_pressed()
+
+            Button:
+                id: acertei_button
+                disabled: True
+                text: "Acertei"
+                on_release:
+                    root.acertei_pressed()
+                    if root.check_flashcard() == None: \
+                    app.root.current = 'finalizarSessao'
+                on_release: app.on_acertos(str(root.acertos))
+
+            Button:
+                id: errei_button
+                disabled: True
+                text: "Errei"
+                on_release:
+                    root.errei_pressed()
+                    if root.check_flashcard() == None: \
+                    app.root.current = 'finalizarSessao'
+                on_release: app.on_acertos(str(root.acertos))
+
+
+            Button:
+                text: "Passar Flashcard"
+                on_release: root.passar_flashcard_pressed()
+
+            Button:
+                on_release: app.root.current = 'finalizarSessao'
+                text: "Sair"
