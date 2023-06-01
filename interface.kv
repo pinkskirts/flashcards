@@ -1,0 +1,233 @@
+#:kivy 2.2.0
+GridLayout:
+    cols: 1
+    ScreenManager:
+        id: gmanager
+        MenuPrincipal:
+            name: 'menu'
+        SessaoFlashcards:
+            name: 'sessaoFlashcard'
+        Configuracoes:
+            name: 'configuracoes'
+        Sessao:
+            name: 'sessao'
+        FinalizarSessao:
+            name: 'finalizarSessao'
+        InserirFlashcard:
+            name: 'inserirFlashcard'    
+        RemoverFlashcard:
+            name: 'removerFlashcard'    
+
+<MenuPrincipal>:
+    name: "menu"
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+
+        Label:
+            text: "Menu"
+            font_size: 32
+
+        GridLayout:
+            cols: 3
+            row_default_height: 240
+            row_force_default: True
+            padding: 10
+
+            Button:
+                text: "Começar"
+                font_size: 32
+                on_release:
+                    root.manager.current = 'sessaoFlashcard'
+                    root.manager.transition.direction = "left"
+
+            Button:
+                text: "Sair"        
+                font_size: 32
+                on_release:
+                    exit()
+
+<SessaoFlashcards>:
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+        Label:
+            text: "Sessao"
+            font_size: 32
+
+        GridLayout:
+            cols: 2
+            Button:
+                text: "Iniciar Sessao"
+                font_size: 32
+                on_release:
+                    root.manager.current = 'sessao'
+                    root.manager.transition.direction = "right"
+                    app.on_baralho_sessao(root.baralho)
+
+            Button:
+                text: "Configurações"
+                font_size: 32
+                on_release:
+                    root.manager.current = 'configuracoes'
+                    root.manager.transition.direction = "left"
+                    app.on_baralho_configuracao(root.baralho)
+
+            Button:
+                text: "Voltar para o Menu"
+                font_size: 32
+                on_release:
+                    root.manager.current = 'menu'
+                    root.manager.transition.direction = "right"
+
+<Configuracoes>:
+    GridLayout:
+        cols: 3
+        Button:
+            text: "Inserir Flashcard"
+            font_size: 32
+            on_release:
+                root.manager.current = 'inserirFlashcard'
+                app.on_baralho_inserir(root.baralho)
+        Button:
+            text: "Remover Flashcard"
+            font_size: 32
+            on_release:
+                root.manager.current = 'removerFlashcard'
+                app.on_baralho_remover(root.baralho)
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'sessaoFlashcard'
+        
+<InserirFlashcard>:
+    GridLayout:
+        cols: 2
+        TextInput:
+            id: pergunta
+            multiline: False
+        TextInput:
+            id: resposta
+            multiline: False
+        Button:
+            text: "Inserir"
+            font_size: 32
+            on_release:
+                root.inserir_pressed()
+                app.atualizarBaralho(root.baralho)
+                root.manager.current = 'configuracoes'
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'configuracoes'
+ 
+ 
+<RemoverFlashcard>:
+    GridLayout:
+        cols: 2
+        Label:
+            id: display
+        TextInput:
+            id: remover
+            multiline: False
+        Button:
+            text: "Remover"
+            font_size: 32
+            on_release:
+                root.remover_pressed()
+                app.atualizarBaralho(root.baralho)
+                root.manager.current = 'configuracoes'
+        Button:
+            text: "Voltar"
+            font_size: 32
+            on_release: root.manager.current = 'sessaoFlashcard'
+ 
+
+<FinalizarSessao>:
+    GridLayout:
+        cols: 1
+
+        Label:
+            text: "Sessao Finalizada"
+
+        Label:
+            id: corretas
+            text: "Flashcards Respondidos corretamente: " + root.acertos
+
+        Button:
+            text: "Sair"
+            on_release: root.manager.current = 'menu'
+
+<Sessao>:
+    name: "sessao"
+    flashcard: self.flashcard
+    GridLayout:
+        cols: 1
+        padding: 20
+        spacing: 20
+        
+        Label:
+            id: flashcard_label
+            angle: 0
+            background_color: 250/255.0, 237/255.0, 161/255.0, 98/255.0
+            canvas.before:
+                PushMatrix
+                Rotate:
+                    angle: self.angle
+                    axis: 1,0,0
+                    origin: self.center
+                Color:
+                    rgba: self.background_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            canvas.after:
+                PopMatrix        
+
+        GridLayout:
+            cols: 3
+            rows: 2
+            row_default_height: 240
+            row_force_default: True
+
+            Button:
+                id: mostrar_resposta_button
+                text: "Mostrar Resposta"
+                on_release:
+                    root.animacaoFlashcard(flashcard_label)
+                    root.mostrar_resposta_pressed()
+
+            Button:
+                id: acertei_button
+                disabled: True
+                text: "Acertei"
+                on_release:
+                    root.acertei_pressed()
+                    if root.check_flashcard() == None: \
+                    root.manager.current = 'finalizarSessao'
+                on_release:
+                    app.on_acertos(str(root.acertos))
+
+            Button:
+                id: errei_button
+                disabled: True
+                text: "Errei"
+                on_release:
+                    root.errei_pressed()
+                    if root.check_flashcard() == None: \
+                    root.manager.current = 'finalizarSessao'
+                on_release:
+                    app.on_acertos(str(root.acertos))
+
+
+            Button:
+                text: "Passar Flashcard"
+                on_release:
+                    root.passar_flashcard_pressed()
+                    if root.check_flashcard() == None: \
+                    root.manager.current = 'finalizarSessao'
+                on_release: app.on_acertos(str(root.acertos))
+
+            Button:
+                on_release: root.manager.current = 'finalizarSessao'
+                text: "Sair"
